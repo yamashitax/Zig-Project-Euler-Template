@@ -42,7 +42,7 @@ pub fn build(b: *Build) void {
     // Set up an exe for each problem
     var problem: u32 = 1;
     while (problem <= PROBLEMS_NUM) : (problem += 1) {
-        const problemString = b.fmt("problem{:0>2}", .{problem});
+        const problemString = b.fmt("problem{:0>3}", .{problem});
         const zigFile = b.fmt("src/{s}.zig", .{problemString});
 
         const exe = b.addExecutable(.{
