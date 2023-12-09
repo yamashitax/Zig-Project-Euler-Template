@@ -23,8 +23,8 @@ pub fn build(b: *Build) void {
     const target = b.standardTargetOptions(.{});
     const mode = b.standardOptimizeOption(.{});
 
-    const install_all = b.step("install_all", "Install all days");
-    const run_all = b.step("run_all", "Run all days");
+    const install_all = b.step("install_all", "Install all problems");
+    const run_all = b.step("run_all", "Run all problems");
 
     const generate = b.step("generate", "Generate stub files from template/template.zig");
     const build_generate = b.addExecutable(.{
@@ -37,14 +37,16 @@ pub fn build(b: *Build) void {
     run_generate.setCwd(.{ .path = std.fs.path.dirname(@src().file).? });
     generate.dependOn(&run_generate.step);
 
-    // Set up an exe for each day
-    var day: u32 = 1;
-    while (day <= 25) : (day += 1) {
-        const dayString = b.fmt("day{:0>2}", .{day});
-        const zigFile = b.fmt("src/{s}.zig", .{dayString});
+    const PROBLEMS_NUM = 856;
+
+    // Set up an exe for each problem
+    var problem: u32 = 1;
+    while (problem <= PROBLEMS_NUM) : (problem += 1) {
+        const problemString = b.fmt("problem{:0>2}", .{problem});
+        const zigFile = b.fmt("src/{s}.zig", .{problemString});
 
         const exe = b.addExecutable(.{
-            .name = dayString,
+            .name = problemString,
             .root_source_file = .{ .path = zigFile },
             .target = target,
             .optimize = mode,
@@ -63,15 +65,15 @@ pub fn build(b: *Build) void {
         const run_test = b.addRunArtifact(build_test);
 
         {
-            const step_key = b.fmt("install_{s}", .{dayString});
-            const step_desc = b.fmt("Install {s}.exe", .{dayString});
+            const step_key = b.fmt("install_{s}", .{problemString});
+            const step_desc = b.fmt("Install {s}.exe", .{problemString});
             const install_step = b.step(step_key, step_desc);
             install_step.dependOn(&install_cmd.step);
             install_all.dependOn(&install_cmd.step);
         }
 
         {
-            const step_key = b.fmt("test_{s}", .{dayString});
+            const step_key = b.fmt("test_{s}", .{problemString});
             const step_desc = b.fmt("Run tests in {s}", .{zigFile});
             const step = b.step(step_key, step_desc);
             step.dependOn(&run_test.step);
@@ -82,8 +84,8 @@ pub fn build(b: *Build) void {
             run_cmd.addArgs(args);
         }
 
-        const run_desc = b.fmt("Run {s}", .{dayString});
-        const run_step = b.step(dayString, run_desc);
+        const run_desc = b.fmt("Run {s}", .{problemString});
+        const run_step = b.step(problemString, run_desc);
         run_step.dependOn(&run_cmd.step);
         run_all.dependOn(&run_cmd.step);
     }
