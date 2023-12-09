@@ -39,6 +39,9 @@ const sort = std.sort.block;
 const asc = std.sort.asc;
 const desc = std.sort.desc;
 
+const reader = std.io.getStdIn().reader();
+const writer = std.io.getStdOut().writer();
+
 // Generated from template/template.zig.
 // Run `zig build generate` to update.
 // Only unmodified days will be updated.
