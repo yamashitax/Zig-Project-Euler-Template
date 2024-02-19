@@ -5,7 +5,7 @@ const CompileStep = std.Build.Step.Compile;
 /// set this to true to link libc
 const should_link_libc = false;
 
-const required_zig_version = std.SemanticVersion.parse("0.12.0-dev.1754+2a3226453") catch unreachable;
+const required_zig_version = std.SemanticVersion.parse("0.12.0-dev.2750+5f9255829") catch unreachable;
 
 fn linkObject(b: *Build, obj: *CompileStep) void {
     if (should_link_libc) obj.linkLibC();
@@ -30,6 +30,7 @@ pub fn build(b: *Build) void {
     const build_generate = b.addExecutable(.{
         .name = "generate",
         .root_source_file = .{ .path = "template/generate.zig" },
+        .target = target,
         .optimize = .ReleaseSafe,
     });
 
