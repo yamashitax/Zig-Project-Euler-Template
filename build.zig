@@ -1,9 +1,7 @@
-const std = @import("std");
-const Build = std.Build;
-const CompileStep = std.Build.Step.Compile;
-
 /// set this to true to link libc
 const should_link_libc = false;
+
+const PROBLEMS_NUM = 856;
 
 const required_zig_version = std.SemanticVersion.parse("0.12.0-dev.2750+5f9255829") catch unreachable;
 
@@ -34,15 +32,20 @@ pub fn build(b: *Build) void {
         .optimize = .ReleaseSafe,
     });
 
+    const exe_options = b.addOptions();
+    build_generate.root_module.addOptions("build_options", exe_options);
+
+    const problem_num: u32 = b.option(u32, "problem-num", "How many problems to generate") orelse PROBLEMS_NUM;
+
+    exe_options.addOption(u32, "problem_num", problem_num);
+
     const run_generate = b.addRunArtifact(build_generate);
     run_generate.setCwd(.{ .path = std.fs.path.dirname(@src().file).? });
     generate.dependOn(&run_generate.step);
 
-    const PROBLEMS_NUM = 856;
-
     // Set up an exe for each problem
     var problem: u32 = 1;
-    while (problem <= PROBLEMS_NUM) : (problem += 1) {
+    while (problem <= problem_num) : (problem += 1) {
         const problemString = b.fmt("problem{:0>3}", .{problem});
         const zigFile = b.fmt("src/{s}.zig", .{problemString});
 
@@ -103,3 +106,8 @@ pub fn build(b: *Build) void {
         test_util.dependOn(&test_cmd.step);
     }
 }
+
+const std = @import("std");
+
+const Build = std.Build;
+const CompileStep = std.Build.Step.Compile;
